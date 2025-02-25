@@ -7,6 +7,8 @@ import PasswordValidations from '../components/PasswordValidations';
 import SearchDropdown from '../components/SearchDropdown';
 import { OptionType } from '../models/OptionType';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import Image from '../components/Image';
 
 const Register: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -22,6 +24,14 @@ const Register: React.FC = () => {
   const [state, setState] = useState<OptionType | null>(null);
   const [cities, setCities] = useState<OptionType[]>([]);
   const [city, setCity] = useState<OptionType | null>(null);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      navigate('/');
+    }
+  }, []);
 
   // Password validation state
   const [passwordValidations, setPasswordValidations] = useState({
@@ -43,7 +53,7 @@ const Register: React.FC = () => {
       isLongEnough: password.length >= 8,
       mustMatch: password === confirmPassword,
     });
-  }, [password, confirmPassword]); // Runs every time password changes
+  }, [password, confirmPassword]);
 
   const GEO_NAMES_USERNAME = 'groza29';
 
@@ -239,12 +249,12 @@ const Register: React.FC = () => {
   return (
     <div className="flex h-screen">
       {/* Left Section - Image */}
-      <div className="w-4/6">
-        <img src="/images/register4.jpg" className="w-full h-full object-cover shadow-lg" />
+      <div className="hidden lg:w-4/6 lg:block">
+        <Image source="/images/register4.jpg" />
       </div>
 
       {/* Right Section - Form */}
-      <div className="w-2/6 flex items-center justify-center bg-background">
+      <div className="lg:w-2/6 w-full flex items-center justify-center bg-background">
         <div className="w-96">
           {step === 1 && (
             <>

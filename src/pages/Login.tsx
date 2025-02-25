@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
 import TextWithLinksProps from '../components/TextsWithLinks';
 import Links from '../components/Links';
+import { useNavigate } from 'react-router-dom';
+import Image from '../components/Image';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      navigate('/');
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,8 +40,9 @@ const Login: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log('Login successful:', data.token);
       localStorage.setItem('token', `${data.token}`);
+      navigate('/');
+
       Swal.fire({
         icon: 'success',
         title: 'Login Successful!',
@@ -80,9 +90,9 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen flex-wrap">
       {/* Left Section - Login Form */}
-      <div className="w-2/5 flex items-center justify-center bg-background">
+      <div className="w-full lg:w-2/5 flex items-center justify-center bg-background">
         <div className="w-96 p-8 rounded-lg">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Input */}
@@ -118,8 +128,8 @@ const Login: React.FC = () => {
       </div>
 
       {/* Right Section - Image */}
-      <div className="w-3/5">
-        <img src="/images/login1.jpg" className="w-full h-full object-cover shadow-lg" />
+      <div className="hidden lg:block lg:w-3/5">
+        <Image source="/images/login1.jpg" />
       </div>
     </div>
   );
