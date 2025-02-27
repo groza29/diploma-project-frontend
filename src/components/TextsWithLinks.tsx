@@ -6,11 +6,7 @@ interface TextWithLinksProps {
   route?: string;
 }
 
-const TextWithLinksProps: React.FC<TextWithLinksProps> = ({
-  textPrimary,
-  textSecondary,
-  route,
-}) => (
+const TextWithLinks: React.FC<TextWithLinksProps> = ({ textPrimary, textSecondary, route }) => (
   <>
     <p className="mt-6 text-sm font-thin text-text">{textPrimary} </p>
     <a
@@ -22,4 +18,4 @@ const TextWithLinksProps: React.FC<TextWithLinksProps> = ({
   </>
 );
 
-export default TextWithLinksProps;
+export default TextWithLinks;

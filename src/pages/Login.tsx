@@ -56,7 +56,7 @@ const Login: React.FC = () => {
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
-        text: err.message || 'Something went wrong!',
+        text: error || 'Something went wrong!',
         draggable: true,
         iconColor: '#0C969C',
         customClass: {

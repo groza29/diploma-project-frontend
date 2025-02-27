@@ -74,7 +74,6 @@ const Register: React.FC = () => {
         console.error('Error fetching countries:', error);
       }
     };
-
     fetchCountries();
   }, []);
 

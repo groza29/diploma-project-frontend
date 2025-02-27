@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import Navbar from './components/NavBarRoutes';
 import Home from './pages/Home';
 // import Posts from './pages/Posts';
 // import Community from './pages/Community';
@@ -8,7 +7,8 @@ import Home from './pages/Home';
 // import CreatePost from './pages/CreatePost';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import NavbarRoutes from './components/NavBarRoutes';
+import NavbarRoutes from './components/NavBar/NavBarRoutes';
+import MyProfile from './pages/MyProfile';
 
 const App = () => {
   return (
@@ -35,10 +35,10 @@ const MainLayout = () => {
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
         {/* <Route path="/posts" element={<Posts />} /> */}
-        {/* <Route path="/community" element={<Community />} />
-        <Route path="/my-profile" element={<Profile />} />
+        {/* {/* <Route path="/community" element={<Community />} />
         <Route path="/my-posts" element={<MyPosts />} />
         <Route path="/create-a-post" element={<CreatePost />} /> */}
+        <Route path="/my-profile" element={<MyProfile />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>

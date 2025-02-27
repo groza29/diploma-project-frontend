@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 
 interface InputFieldProps {
   label: string;
@@ -37,7 +38,7 @@ const InputField: React.FC<InputFieldProps> = ({
             className="absolute right-3 top-3 text-gray-500"
             onClick={() => setShowPassword(!showPassword)}
           >
-            {showPassword ? <FaEyeSlash /> : <FaEye />}
+            {showPassword ? <VisibilityOutlinedIcon /> : <VisibilityOffOutlinedIcon />}
           </button>
         )}
       </div>

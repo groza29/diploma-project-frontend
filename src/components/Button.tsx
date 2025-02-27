@@ -17,7 +17,7 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   nav = false,
 }) => {
-  return nav == false ? (
+  return nav === false ? (
     <button
       type={type}
       onClick={onClick}
