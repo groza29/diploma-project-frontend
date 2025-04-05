@@ -9,6 +9,10 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import NavbarRoutes from './components/NavBar/NavBarRoutes';
 import MyProfile from './pages/MyProfile';
+import AvatarUpload from './pages/UploadFiles';
+import { AvatarProvider } from './context/AvatarContext';
+import { UserProvider } from './context/UserContext';
+import CreatePost from './pages/CreatePost';
 
 const App = () => {
   return (
@@ -27,21 +31,25 @@ const MainLayout = () => {
 
   return (
     <div>
-      {/* Conditionally render Navbar */}
-      {!hideNavbarRoutes.includes(location.pathname) && <NavbarRoutes />}
+      <AvatarProvider>
+        <UserProvider>
+          {/* Conditionally render Navbar */}
+          {!hideNavbarRoutes.includes(location.pathname) && <NavbarRoutes />}
 
-      {/* Page Content */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
-        {/* <Route path="/posts" element={<Posts />} /> */}
-        {/* {/* <Route path="/community" element={<Community />} />
-        <Route path="/my-posts" element={<MyPosts />} />
-        <Route path="/create-a-post" element={<CreatePost />} /> */}
-        <Route path="/my-profile" element={<MyProfile />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
+          {/* Page Content */}
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/posts" element={<AvatarUpload />} />
+            {/* {/* <Route path="/community" element={<Community />} />
+        <Route path="/my-posts" element={<MyPosts />} />*/}
+            <Route path="/create-a-post" element={<CreatePost />} />
+            <Route path="/my-profile" element={<MyProfile />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Routes>
+        </UserProvider>
+      </AvatarProvider>
     </div>
   );
 };

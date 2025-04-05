@@ -4,10 +4,10 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 
 interface InputFieldProps {
   label: string;
-  type: 'text' | 'email' | 'password';
+  type: 'text' | 'email' | 'password' | 'date';
   placeholder: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   showPasswordToggle?: boolean;
 }
 
