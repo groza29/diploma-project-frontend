@@ -1,39 +1,50 @@
 import React from 'react';
 import { Autocomplete, TextField } from '@mui/material';
+import { OptionType } from '../models/OptionType';
 
-interface OptionType {
+interface BaseProps {
+  options: OptionType[];
   label: string;
-  value: string;
+  multiple?: boolean;
 }
 
-interface SearchDropdownProps {
-  options: OptionType[];
+interface SingleSelectProps extends BaseProps {
+  multiple?: false;
   selectedOption: OptionType | null;
   setSelectedOption: (option: OptionType | null) => void;
-  label: string;
 }
+
+interface MultiSelectProps extends BaseProps {
+  multiple: true;
+  selectedOption: OptionType[];
+  setSelectedOption: (option: OptionType[]) => void;
+}
+
+type SearchDropdownProps = SingleSelectProps | MultiSelectProps;
 
 const SearchDropdown: React.FC<SearchDropdownProps> = ({
   options,
   selectedOption,
   setSelectedOption,
   label,
+  multiple = false,
 }) => {
   return (
     <div>
       <label className="block text-m font-thin text-text mb-2">{label}</label>
       <Autocomplete
-        className="w-full rounded-md bg-white  text-base text-text focus:outline-none focus:ring-2 focus:selected placeholder-selected placeholder-opacity-45"
+        multiple={multiple}
         options={options}
-        getOptionLabel={(option) => option.label}
         value={selectedOption}
-        onChange={(_, newValue) => setSelectedOption(newValue)}
-        renderInput={(params) => <TextField {...params} variant="outlined" fullWidth />}
+        onChange={(_, newValue) => setSelectedOption(newValue as any)}
+        getOptionLabel={(option) => option.label}
         filterOptions={(options, state) =>
           options.filter((option) =>
             option.label.toLowerCase().includes(state.inputValue.toLowerCase())
           )
         }
+        renderInput={(params) => <TextField {...params} variant="outlined" fullWidth />}
+        className="w-full rounded-md bg-white text-base text-text focus:outline-none"
       />
     </div>
   );

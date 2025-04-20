@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import getUserID from '../utils/User_Id';
 
 const AvatarUpload: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const token = localStorage.getItem('token');
-  let userId = '462c41a2-f5f0-4ffe-9b84-e05d58f77ea9';
+  const [userId, setUserId] = useState<string | null>(null);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return;
+    }
+    const id = getUserID(token);
+    setUserId(id);
+  }, []);
+
   // Fetch existing avatar URL
   useEffect(() => {
     const fetchAvatar = async () => {

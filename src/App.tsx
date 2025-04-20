@@ -13,6 +13,7 @@ import AvatarUpload from './pages/UploadFiles';
 import { AvatarProvider } from './context/AvatarContext';
 import { UserProvider } from './context/UserContext';
 import CreatePost from './pages/CreatePost';
+import MyPosts from './pages/MyPosts';
 
 const App = () => {
   return (
@@ -41,8 +42,8 @@ const MainLayout = () => {
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
             <Route path="/posts" element={<AvatarUpload />} />
-            {/* {/* <Route path="/community" element={<Community />} />
-        <Route path="/my-posts" element={<MyPosts />} />*/}
+            {/* { <Route path="/community" element={<Community />} /> */}
+            <Route path="/my-posts" element={<MyPosts />} />
             <Route path="/create-a-post" element={<CreatePost />} />
             <Route path="/my-profile" element={<MyProfile />} />
             <Route path="/login" element={<Login />} />
