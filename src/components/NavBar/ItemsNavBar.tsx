@@ -5,10 +5,10 @@ interface ItemsNavBarProps {
 }
 
 const ItemsNavBar: React.FC<ItemsNavBarProps> = ({ items }) => {
-  const location = useLocation(); // Ensure location is inside the component
+  const location = useLocation();
 
   return (
-    <ul className="flex gap-6">
+    <ul className="flex flex-col lg:flex-row gap-4">
       {items.map((item, index) => {
         const itemPath = item.toLowerCase().replace(/\s+/g, '-');
         const isActive =
@@ -20,7 +20,7 @@ const ItemsNavBar: React.FC<ItemsNavBarProps> = ({ items }) => {
           <li key={index}>
             <Link
               to={`/${itemPath}`}
-              className={`px-3 py-2 rounded-md ${
+              className={`px-3 py-2 rounded-md block ${
                 isActive ? 'bg-selected bg-opacity-45 text-text' : 'hover:text-selected'
               }`}
             >

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ElementType, useState } from 'react';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 
@@ -32,6 +32,7 @@ const InputField: React.FC<InputFieldProps> = ({
           onChange={onChange}
           className="w-full rounded-md bg-white px-4 py-4 border border-border text-base text-text focus:outline-none focus:ring-2 focus:selected placeholder-selected placeholder-opacity-45"
         />
+
         {showPasswordToggle && (
           <button
             type="button"

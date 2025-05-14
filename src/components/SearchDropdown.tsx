@@ -6,6 +6,7 @@ interface BaseProps {
   options: OptionType[];
   label: string;
   multiple?: boolean;
+  style?: boolean;
 }
 
 interface SingleSelectProps extends BaseProps {
@@ -28,9 +29,10 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
   setSelectedOption,
   label,
   multiple = false,
+  style = false,
 }) => {
   return (
-    <div>
+    <div className={style ? 'w-full' : ''}>
       <label className="block text-m font-thin text-text mb-2">{label}</label>
       <Autocomplete
         multiple={multiple}

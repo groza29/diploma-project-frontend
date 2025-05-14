@@ -7,6 +7,7 @@ interface ButtonProps {
   className?: string;
   disabled?: boolean;
   nav?: boolean;
+  icon?: React.ReactNode; // 👈 Add this line
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -16,24 +17,20 @@ const Button: React.FC<ButtonProps> = ({
   className,
   disabled = false,
   nav = false,
+  icon, // 👈 Receive the prop
 }) => {
-  return nav === false ? (
+  const baseStyles = `flex items-center gap-2 font-thin text-text py-2 px-4 rounded-md mt-4 mb transition hover:text-white ${className}`;
+  const navStyles = nav ? `bg-background hover:bg-selected` : `bg-primary hover:bg-selected`;
+
+  return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`bg-primary font-thin text-text py-2 px-4 rounded-md mt-4 mb hover:bg-selected transition hover:text-white  ${className}`}
+      className={`${baseStyles} ${navStyles}`}
     >
-      {text}
-    </button>
-  ) : (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`bg-background font-thin text-text py-2 px-4 rounded-md mt-4 mb hover:bg-selected transition hover:text-white  ${className}`}
-    >
-      {text}
+      <span>{text}</span>
+      {icon && <span className="text-text text-thin hover:text-white text-sm">{icon}</span>}
     </button>
   );
 };

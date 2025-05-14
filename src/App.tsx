@@ -9,11 +9,12 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import NavbarRoutes from './components/NavBar/NavBarRoutes';
 import MyProfile from './pages/MyProfile';
-import AvatarUpload from './pages/UploadFiles';
 import { AvatarProvider } from './context/AvatarContext';
 import { UserProvider } from './context/UserContext';
 import CreatePost from './pages/CreatePost';
 import MyPosts from './pages/MyPosts';
+import EditPost from './pages/EditPost';
+import Community from './pages/Comunity';
 
 const App = () => {
   return (
@@ -41,13 +42,14 @@ const MainLayout = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/posts" element={<AvatarUpload />} />
-            {/* { <Route path="/community" element={<Community />} /> */}
+            <Route path="/posts" element={<Home />} />
+            <Route path="/community" element={<Community />} />
             <Route path="/my-posts" element={<MyPosts />} />
             <Route path="/create-a-post" element={<CreatePost />} />
             <Route path="/my-profile" element={<MyProfile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/edit-post/:id" element={<EditPost />} />
           </Routes>
         </UserProvider>
       </AvatarProvider>

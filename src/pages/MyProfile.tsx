@@ -1,7 +1,7 @@
 import { jwtDecode } from 'jwt-decode';
 import JwtDecodeUserType from '../models/JwtDecodeUserType';
 import Image from '../components/Image';
-import { FileUpload, Instagram, PlaceOutlined } from '@mui/icons-material';
+import { Add, Edit, FileUpload, Instagram, PlaceOutlined, Save } from '@mui/icons-material';
 import Swal from 'sweetalert2';
 import { useAvatar } from '../context/AvatarContext';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
@@ -11,6 +11,11 @@ import { User } from '../models/UsersModel';
 import ProfileJob from '../components/ProfileJob';
 import { Job } from '../models/JobType';
 import getAccountAge from '../utils/AccountAge';
+import { useLocation } from 'react-router-dom';
+import Button from '../components/Button';
+import InputField from '../components/InputField';
+import SearchDropdown from '../components/SearchDropdown';
+import { OptionType } from '../models/OptionType';
 
 const MyProfile: React.FC = () => {
   const { avatarUrl, updateAvatar } = useAvatar();
@@ -19,6 +24,57 @@ const MyProfile: React.FC = () => {
   const [userData, setUserData] = useState<User>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const location = useLocation();
+  const isMyProfile = location.pathname === '/my-profile';
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [editedDescription, setEditedDescription] = useState('');
+  const [editedInstagram, setEditedInstagram] = useState('');
+  const [editedLinkedin, setEditedLinkedin] = useState('');
+  const [isEditJobs, setIsEditJob] = useState(false);
+  const [jobsData, setJobData] = useState<OptionType[]>([]);
+  const [selectedJobs, setSelectedJobs] = useState<OptionType[]>([]);
+
+  useEffect(() => {
+    const fetchJobsAndPrepareSelected = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/jobs');
+        const data = await response.json();
+        if (userData?.jobs) {
+          const sortedJobs = data
+            .sort((a: any, b: any) => a.name.localeCompare(b.name))
+            .map((job: any) => ({
+              label: job.name,
+              value: job.id,
+            }));
+          setJobData(sortedJobs);
+        } else {
+          const sortedJobs = data
+            .sort((a: any, b: any) => a.name.localeCompare(b.name))
+            .map((job: any) => ({
+              label: job.name,
+              value: job.id,
+            }));
+          setJobData(sortedJobs);
+        }
+
+        // 💡 If editing jobs, preselect the user's current jobs
+        if (userData?.jobs && isMyProfile && isEditJobs) {
+          const mappedSelectedJobs = userData.jobs.map((job: any) => ({
+            label: job.name,
+            value: job.id,
+          }));
+          setSelectedJobs(mappedSelectedJobs);
+        }
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+      }
+    };
+
+    // Only run when isEditJobs changes
+    if (isEditJobs) {
+      fetchJobsAndPrepareSelected();
+    }
+  }, [isEditJobs, userData, isMyProfile]);
 
   const handleUpload = async (selectedFile: File) => {
     if (!selectedFile) {
@@ -43,20 +99,23 @@ const MyProfile: React.FC = () => {
       Swal.fire('Error', 'Failed to upload avatar', 'error');
     }
   };
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/users/${user?.id}`);
-        if (!response.ok) throw new Error('failed to fetch the user');
+  const fetchUser = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/users/${user?.id}`);
+      if (!response.ok) throw new Error('failed to fetch the user');
 
-        const data = await response.json();
-        setUserData(data);
-        setLoading(false);
-      } catch (err: any) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
+      const data = await response.json();
+      setUserData(data);
+      setEditedDescription(data.description);
+      setEditedInstagram(data.instagram);
+      setEditedLinkedin(data.linkedin);
+      setLoading(false);
+    } catch (err: any) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchUser();
     console.log(userData);
   }, []);
@@ -117,44 +176,100 @@ const MyProfile: React.FC = () => {
   return (
     <div className="lg:h-screen lg:w-screen bg-background">
       <div className="lg:w-screen flex justify-center lg:justify-start py-10 pl-2 lg:pl-14">
-        <div
-          className="w-32 h-32 rounded-full group overflow-hidden cursor-pointer relative"
-          onClick={openUpdateAvatar}
-        >
-          {avatarUrl ? (
-            <>
-              <Image
-                source={avatarUrl}
-                alt="Avatar"
-                className="w-full h-full object-cover group-hover:opacity-30 transition-opacity duration-300"
-              />
-              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <FileUpload className="text-white text-6xl" />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="w-full h-full bg-secondary flex items-center justify-center text-gray-500">
-                No Avatar
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <FileUpload className="text-white text-xl" />
-              </div>
-            </>
-          )}
-        </div>
-        <div className="lg:mx-10 mx-4 grid grid-col-1 items-center lg:w-80">
-          <h2 className="lg:text-5xl text-xl font-bold text-primary">{userData!.firstName}</h2>
-          <div className="flex justify-between">
-            <div className="flex">
+        {isMyProfile ? (
+          <div
+            className="w-32 h-32 rounded-full group overflow-hidden cursor-pointer relative"
+            onClick={openUpdateAvatar}
+          >
+            {avatarUrl ? (
+              <>
+                <Image
+                  source={avatarUrl}
+                  alt="Avatar"
+                  className="w-full h-full object-cover group-hover:opacity-30 transition-opacity duration-300"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <FileUpload className="text-white text-6xl" />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-full h-full bg-secondary flex items-center justify-center text-gray-500">
+                  No Avatar
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <FileUpload className="text-white text-xl" />
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="w-32 h-32 rounded-full group overflow-hidden cursor-pointer relative">
+            {avatarUrl ? (
+              <>
+                <Image source={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              </>
+            ) : (
+              <>
+                <div className="w-full h-full bg-secondary flex items-center justify-center text-gray-500">
+                  No Avatar
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        <div className="lg:mx-10 mx-4 grid grid-col-1 items-center lg:w-90">
+          <div className="flex gap-2 lg:mb-2">
+            <h2 className="lg:text-5xl text-xl font-bold text-primary">{userData!.lastName}</h2>
+            <h2 className="lg:text-5xl text-xl font-bold text-primary">{userData!.firstName}</h2>
+          </div>
+          <div className="w-full flex justify-between">
+            <div className="w-full flex">
               <PlaceOutlined className="text-primary" />
               <h2>
                 {userData!.country} {userData!.county} {userData!.city}{' '}
               </h2>
             </div>
             <div>
-              <Instagram onClick={openUpdateAvatar} className="text-primary cursor-pointer" />
-              <LinkedInIcon onClick={openUpdateAvatar} className="text-primary cursor-pointer" />
+              <div className=" w-full flex justify-center items-center">
+                <Instagram
+                  onClick={() =>
+                    userData?.instagram
+                      ? window.open(userData.instagram, '_blank')
+                      : Swal.fire('Error', 'There is no link added', 'error')
+                  }
+                  className="text-primary cursor-pointer"
+                />
+                {isEditingDescription && (
+                  <InputField
+                    label={''}
+                    type={'text'}
+                    placeholder={'Instagram link'}
+                    value={editedInstagram}
+                    onChange={(e) => setEditedInstagram(e.target.value)}
+                  />
+                )}
+              </div>
+              <div className="flex justify-center items-center">
+                <LinkedInIcon
+                  onClick={() =>
+                    userData?.linkedin
+                      ? window.open(userData.linkedin, '_blank')
+                      : Swal.fire('Error', 'There is no link added', 'error')
+                  }
+                  className="text-primary cursor-pointer"
+                />
+                {isEditingDescription && (
+                  <InputField
+                    label={''}
+                    type={'text'}
+                    placeholder={'LinkedIn link'}
+                    value={editedLinkedin}
+                    onChange={(e) => setEditedLinkedin(e.target.value)}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -163,14 +278,65 @@ const MyProfile: React.FC = () => {
         <div className="w-full max-w-6xl flex flex-col md:flex-row gap-12">
           {/* Left Card - About Me */}
           <div className="bg-white rounded-2xl shadow-lg p-10 w-full md:w-[50%] min-h-[250px] flex flex-col justify-center text-wrap">
-            <h2 className="text-xl font-thin text-primary uppercase">About</h2>
-            <p className="text-text mt-4 text-lg lg:w-full w-30">{userData!.description}</p>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-thin text-primary uppercase">About</h2>
+              {isMyProfile && (
+                <Button
+                  text={isEditingDescription ? 'Save' : 'Edit'}
+                  icon={isEditingDescription ? <Save /> : <Edit />}
+                  className="bg-white mb-4"
+                  onClick={async () => {
+                    if (isEditingDescription) {
+                      try {
+                        const response = await fetch(`http://localhost:3000/users/${user?.id}`, {
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            description: editedDescription,
+                            instagram: editedInstagram,
+                            linkedin: editedLinkedin,
+                          }),
+                        });
+                        if (!response.ok) throw new Error('Failed to update description');
+                        setUserData((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                description: editedDescription,
+                                instagram: editedInstagram,
+                                linkedin: editedLinkedin,
+                              }
+                            : prev
+                        );
+                        Swal.fire('Updated!', 'Description updated successfully.', 'success');
+                      } catch (err) {
+                        Swal.fire('Error', 'Could not update description', 'error');
+                      }
+                    }
+                    setIsEditingDescription(!isEditingDescription);
+                  }}
+                />
+              )}
+            </div>
+            {isEditingDescription ? (
+              <textarea
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+                className="text-text mt-4 text-lg lg:w-full w-30 border border-gray-300 rounded-md p-2"
+                rows={Math.max(3, editedDescription.length) / 50}
+              />
+            ) : (
+              <p className="text-text mt-4 text-lg lg:w-full w-30">{userData!.description}</p>
+            )}{' '}
           </div>
 
           {/* Right Card - Experience & Rating */}
           <div className="bg-white rounded-2xl shadow-lg p-10 w-full md:w-[50%] min-h-[250px] flex flex-col items-center justify-center">
             <h2 className="text-2xl font-bold text-text">
-              <span className="text-primary">{getAccountAge(userData!.createdAt)}</span> on DoSo
+              <span className="text-primary">
+                {getAccountAge(userData!.createdAt)} <span className="text-text">On</span>
+                <img alt="dosoLogo" src="./images/doso.svg" className="p-2" />
+              </span>
             </h2>
             <Rating
               name="rating"
@@ -195,8 +361,87 @@ const MyProfile: React.FC = () => {
       </div>
       <div className="bg-background flex justify-center items-center py-10">
         <div className="bg-white rounded-2xl shadow-lg p-10 w-4/5 md:w-[90%] min-h-[250px] mx-10 ">
-          <h2 className="text-xl font-thin text-primary uppercase">Jobs</h2>
-          <ProfileJob content={userData!.jobs as unknown as Job[]} />
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-thin text-primary uppercase">Jobs</h2>
+            {isMyProfile && (
+              <Button
+                text={isEditJobs ? 'Save' : 'Edit'}
+                icon={isEditJobs ? <Save /> : <Edit />}
+                className="bg-white mb-4"
+                onClick={async () => {
+                  if (isEditJobs) {
+                    try {
+                      const response = await fetch(`http://localhost:3000/users/${user?.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          jobs: selectedJobs.map((job) => job.value),
+                        }),
+                      });
+                      if (!response.ok) throw new Error('Failed to update description');
+                      setUserData((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              jobs: selectedJobs.map((job) => job.value),
+                            }
+                          : prev
+                      );
+                      Swal.fire('Updated!', 'Jobs updated successfully.', 'success');
+                      fetchUser();
+                    } catch (err) {
+                      Swal.fire('Error', 'Could not update jobs', 'error');
+                    }
+                  }
+                  setIsEditJob(!isEditJobs);
+                }}
+              />
+            )}
+          </div>
+          {!userData!.jobs ? (
+            <div className="flex items-center justify-center flex-col">
+              {' '}
+              {isMyProfile && isEditJobs && (
+                <div className="flex flex-col items-center justify-center">
+                  <h1 className="text-3xl font-thin">No jobs..</h1>
+
+                  <Button
+                    text={'Add a new Job'}
+                    icon={<Add />}
+                    className="mb-4"
+                    onClick={() => setIsEditJob(true)}
+                  />
+                </div>
+              )}
+              {isMyProfile && !isEditJobs && (
+                <div className=" w-full flex flex-col">
+                  <SearchDropdown
+                    options={jobsData}
+                    selectedOption={selectedJobs}
+                    setSelectedOption={setSelectedJobs}
+                    label={''}
+                    multiple={true}
+                  />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div>
+              {' '}
+              {isMyProfile && isEditJobs && (
+                <div className=" w-full flex flex-col">
+                  <SearchDropdown
+                    options={jobsData}
+                    selectedOption={selectedJobs}
+                    setSelectedOption={setSelectedJobs}
+                    label={''}
+                    multiple={true}
+                  />
+                </div>
+              )}
+              {!isEditJobs && <ProfileJob content={userData!.jobs as unknown as Job[]} />}
+            </div>
+          )}
         </div>
       </div>
       <div className="bg-background flex justify-center flex-wrap items-center py-10 gap-12 flex-col md:flex-row lg:flex-row">

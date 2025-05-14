@@ -5,9 +5,18 @@ import getUserID from '../utils/User_Id';
 import Swal from 'sweetalert2';
 import PostCard from '../components/PostCard';
 
+interface PostType {
+  id: string;
+  title: string;
+  body: string;
+  photos?: string[];
+  createdAt: number;
+  imagePreview?: string;
+}
+
 const MyPosts: React.FC = () => {
   const navigate = useNavigate();
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<PostType[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,8 +36,12 @@ const MyPosts: React.FC = () => {
       try {
         const response = await fetch(`http://localhost:3000/posts/user/${userId}`);
         const data = await response.json();
-        const sortedPosts = data.sort((a: any, b: any) => b.createdAt - a.createdAt);
-        setPosts(sortedPosts);
+
+        if (Array.isArray(data.posts)) {
+          setPosts(data.posts);
+        } else if (Array.isArray(data)) {
+          setPosts(data);
+        }
       } catch (error) {
         console.error('Error fetching posts:', error);
       }
@@ -61,8 +74,10 @@ const MyPosts: React.FC = () => {
             id={post.id}
             title={post.title}
             body={post.body}
-            photoUrl={post.photos?.[0]}
+            images={post.imagesUrls}
+            status={post.status}
             onSeeMore={() => navigate(`/post/${post.id}`)}
+            onEdit={() => navigate(`/edit-post/${post.id}`)}
           />
         ))}
       </div>

@@ -5,7 +5,6 @@ interface ProfileJobProps {
   content: Job[];
 }
 const ProfileJob: React.FC<ProfileJobProps> = ({ content }) => {
-  console.log(content);
   return (
     <div className="flex pt-2 flex-wrap gap-2">
       {content.map((item) => (

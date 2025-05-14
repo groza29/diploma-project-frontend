@@ -43,7 +43,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onFilesSelected }) => {
         />
         <p className="text-lg font-light mt-4">Drag and drop photos to upload</p>
         <div className="mt-2">
-          <Button text="Select files" />
+          <Button text="Select files"  />
         </div>
       </div>
 
