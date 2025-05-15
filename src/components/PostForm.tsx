@@ -19,6 +19,9 @@ interface PostFormProps {
   initialDate?: number;
   initialJobs?: OptionType[];
   imagesUrls?: string[];
+  initialCountry?: string;
+  initialState?: string;
+  initialCity?: string;
   onSubmit: (form: {
     title: string;
     description: string;
@@ -26,6 +29,9 @@ interface PostFormProps {
     jobs: OptionType[];
     files: File[];
     imagesUrls: string[];
+    country: OptionType;
+    state: OptionType;
+    city: OptionType;
   }) => void;
   handleDelete?: () => void;
 }
@@ -39,7 +45,12 @@ const PostForm: React.FC<PostFormProps> = ({
   onSubmit,
   handleDelete,
   imagesUrls = [],
+  initialCountry,
+  initialState,
+  initialCity,
 }) => {
+  const GEO_NAMES_USERNAME = 'groza29';
+
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [timestamp, setTimestamp] = useState(initialDate);
@@ -47,9 +58,14 @@ const PostForm: React.FC<PostFormProps> = ({
   const [files, setFiles] = useState<File[]>([]);
   const [jobsData, setJobData] = useState<OptionType[]>([]);
   const [currentImages, setCurrentImages] = useState<string[]>(imagesUrls);
+  const [country, setCountry] = useState<OptionType | null>(null);
+  const [state, setState] = useState<OptionType | null>(null);
+  const [city, setCity] = useState<OptionType | null>(null);
+  const [countries, setCountries] = useState<OptionType[]>([]);
+  const [states, setStates] = useState<OptionType[]>([]);
+  const [cities, setCities] = useState<OptionType[]>([]);
 
   const formatDate = (timestamp: number) => new Date(timestamp).toISOString().split('T')[0];
-
   useEffect(() => {
     const fetchJobs = async () => {
       try {
@@ -86,9 +102,131 @@ const PostForm: React.FC<PostFormProps> = ({
       });
     }
   };
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch('https://restcountries.com/v3.1/all');
+        const data = await response.json();
+        const sortedCountries = data
+          .sort((a: any, b: any) => a.name.common.localeCompare(b.name.common))
+          .map((country: any) => ({
+            label: country.name.common,
+            value: country.cca2,
+          }));
+        setCountries(sortedCountries);
+      } catch (error) {
+        console.error('Error fetching countries:', error);
+      }
+    };
+    fetchCountries();
+  }, []);
+  useEffect(() => {
+    if (initialCountry && countries.length > 0) {
+      const match = countries.find((c) => c.label === initialCountry);
+      if (match) {
+        setCountry(match);
+      }
+    }
+  }, [initialCountry, countries]);
+
+  useEffect(() => {
+    if (country) {
+      const fetchStates = async () => {
+        try {
+          console.log(`Fetching geonameId for country: ${country.label}`);
+
+          // fetch `geonameId` for the country
+          const countryResponse = await fetch(
+            `http://api.geonames.org/searchJSON?name_equals=${country.label}&featureCode=PCLI&maxRows=1&username=${GEO_NAMES_USERNAME}`
+          );
+          const countryData = await countryResponse.json();
+
+          if (!countryData.geonames || countryData.geonames.length === 0) {
+            throw new Error('No geonameId found for this country.');
+          }
+
+          const countryGeonameId = countryData.geonames[0].geonameId;
+          console.log(`Correct geonameId for ${country.label}: ${countryGeonameId}`);
+
+          // fetch administrative divisions (states/provinces)
+          const stateResponse = await fetch(
+            `http://api.geonames.org/childrenJSON?geonameId=${countryGeonameId}&username=${GEO_NAMES_USERNAME}`
+          );
+          const stateData = await stateResponse.json();
+
+          if (stateData.geonames) {
+            setStates(
+              stateData.geonames.map((state: any) => ({
+                label: state.name,
+                value: state.geonameId,
+              }))
+            );
+          } else {
+            setStates([]);
+          }
+        } catch (error) {
+          console.error('Error fetching states:', error);
+        }
+      };
+
+      fetchStates();
+    } else {
+      setStates([]);
+      setState(null);
+    }
+  }, [country]);
+  useEffect(() => {
+    if (initialState && states.length > 0) {
+      const match = states.find((c) => c.label === initialState);
+      if (match) {
+        setState(match);
+      }
+    }
+  }, [initialState, states]);
+
+  useEffect(() => {
+    if (state) {
+      const fetchCities = async () => {
+        try {
+          console.log(`Fetching cities for state geonameId: ${state.value}`);
+
+          const response = await fetch(
+            `http://api.geonames.org/childrenJSON?geonameId=${state.value}&username=${GEO_NAMES_USERNAME}`
+          );
+          const data = await response.json();
+
+          if (data.geonames) {
+            setCities(
+              data.geonames.map((city: any) => ({
+                label: city.name,
+                value: city.geonameId,
+              }))
+            );
+          } else {
+            setCities([]);
+          }
+        } catch (error) {
+          console.error('Error fetching cities:', error);
+        }
+      };
+
+      fetchCities();
+    } else {
+      setCities([]);
+      setCity(null);
+    }
+  }, [state]);
+  useEffect(() => {
+    if (initialCity && cities.length > 0) {
+      const match = cities.find((c) => c.label === initialCity);
+      if (match) {
+        setCity(match);
+      }
+    }
+  }, [initialCity, cities]);
 
   const handleSubmit = () => {
-    if (!title || !description || selectedJobs.length === 0) {
+    if (!title || !description || selectedJobs.length === 0 || !country || !state || !city) {
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
@@ -107,6 +245,9 @@ const PostForm: React.FC<PostFormProps> = ({
       jobs: selectedJobs,
       files,
       imagesUrls: currentImages,
+      country: country,
+      state: state,
+      city: city,
     });
   };
   const handleDeleteImage = (index: number) => {
@@ -168,14 +309,45 @@ const PostForm: React.FC<PostFormProps> = ({
             />
           </div>
         </div>
-        <div className="lg:w-2/4 w-3/4 lg:p-8 p-5">
-          <div className="lg:w-2/4 w-3/4 min-w-48 flex justify-center items-center">
+        <div className="lg:w-2/4 flex flex-col w-3/4 lg:p-8 p-5 gap-4">
+          <div className="lg:w-3/4 w-4/4 min-w-48 flex lg:flex-row flex-col justify-center items-center gap-4">
             <InputField
               label="Date of the Job"
               type="date"
               placeholder="Date"
               value={formatDate(timestamp)}
               onChange={handleDateChange}
+            />
+            <SearchDropdown
+              options={countries}
+              label="Country"
+              selectedOption={country}
+              setSelectedOption={(value) => {
+                setCountry(value);
+                setState(null);
+                setCity(null);
+              }}
+              style={true}
+            />
+          </div>
+          <div className="lg:w-3/4 w-4/4 min-w-48 flex lg:flex-row flex-col justify-center items-center gap-4">
+            <SearchDropdown
+              options={states}
+              label="County"
+              selectedOption={state}
+              setSelectedOption={(value) => {
+                setState(value);
+                setCity(null);
+              }}
+              style={true}
+            />
+
+            <SearchDropdown
+              options={cities}
+              label="City"
+              selectedOption={city}
+              setSelectedOption={setCity}
+              style={true}
             />
           </div>
         </div>

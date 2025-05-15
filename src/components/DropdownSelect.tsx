@@ -4,11 +4,12 @@ import { OptionType } from '../models/OptionType';
 
 type DropdownSelectProps = {
   options: OptionType[];
-  value?: OptionType;
+  value?: OptionType | null;
   onChange: (value: OptionType) => void;
+  job?: boolean;
 };
 
-const DropdownSelect: React.FC<DropdownSelectProps> = ({ options, value, onChange }) => {
+const DropdownSelect: React.FC<DropdownSelectProps> = ({ options, value, onChange, job }) => {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = e.target.value;
     const selectedOption = options.find((option) => option.value === selectedValue);
@@ -25,7 +26,7 @@ const DropdownSelect: React.FC<DropdownSelectProps> = ({ options, value, onChang
         className="appearance-none w-full bg-white text-gray-800 py-4 px-4 pr-10 rounded-full shadow focus:outline-none"
       >
         <option value="" disabled hidden>
-          Select a job
+          {job ? 'Select a job' : 'Select a rating'}
         </option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>

@@ -7,7 +7,7 @@ interface ButtonProps {
   className?: string;
   disabled?: boolean;
   nav?: boolean;
-  icon?: React.ReactNode; // 👈 Add this line
+  icon?: React.ReactNode;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -17,7 +17,7 @@ const Button: React.FC<ButtonProps> = ({
   className,
   disabled = false,
   nav = false,
-  icon, // 👈 Receive the prop
+  icon,
 }) => {
   const baseStyles = `flex items-center gap-2 font-thin text-text py-2 px-4 rounded-md mt-4 mb transition hover:text-white ${className}`;
   const navStyles = nav ? `bg-background hover:bg-selected` : `bg-primary hover:bg-selected`;

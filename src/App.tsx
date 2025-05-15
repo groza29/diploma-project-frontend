@@ -50,6 +50,7 @@ const MainLayout = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/edit-post/:id" element={<EditPost />} />
+            <Route path="/profile/:id" element={<MyProfile />} />
           </Routes>
         </UserProvider>
       </AvatarProvider>

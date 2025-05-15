@@ -36,6 +36,9 @@ const EditPost: React.FC = () => {
           date: parseInt(data.actionDate),
           jobs: matchedJobs,
           imagesUrls: data.imagesUrls,
+          country: data.country,
+          state: data.state,
+          city: data.city,
         });
         setLoading(false);
       } catch (error) {
@@ -54,6 +57,9 @@ const EditPost: React.FC = () => {
     jobs,
     files,
     imagesUrls,
+    country,
+    state,
+    city,
   }: {
     title: string;
     description: string;
@@ -61,6 +67,9 @@ const EditPost: React.FC = () => {
     jobs: OptionType[];
     files: File[];
     imagesUrls: string[];
+    country: OptionType;
+    state: OptionType;
+    city: OptionType;
   }) => {
     const token = localStorage.getItem('token');
     const userId = token ? getUserID(token) : null;
@@ -70,10 +79,15 @@ const EditPost: React.FC = () => {
     formData.append('actionDate', date.toString());
     formData.append('user_id', userId!);
     formData.append('jobs', JSON.stringify(jobs.map((j) => j.value)));
+    formData.append('country', country!.label);
+    formData.append('state', state!.label);
+    formData.append('city', city!.label);
+
     imagesUrls.forEach((url) => {
       formData.append('imagesUrls', url);
     });
     files.forEach((file) => formData.append('files', file));
+
     console.log(formData);
     try {
       const res = await fetch(`http://localhost:3000/posts/${id}`, {
@@ -115,6 +129,9 @@ const EditPost: React.FC = () => {
       onSubmit={handleUpdate}
       handleDelete={handleDelete}
       imagesUrls={postData.imagesUrls}
+      initialCountry={postData.country}
+      initialState={postData.state}
+      initialCity={postData.city}
     />
   );
 };

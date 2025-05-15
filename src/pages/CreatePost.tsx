@@ -1,4 +1,3 @@
-// pages/CreatePost.tsx
 import React from 'react';
 import PostForm from '../components/PostForm';
 import Swal from 'sweetalert2';
@@ -8,7 +7,16 @@ import { useNavigate } from 'react-router-dom';
 const CreatePost = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = async ({ title, description, date, jobs, files }: any) => {
+  const handleSubmit = async ({
+    title,
+    description,
+    date,
+    jobs,
+    files,
+    country,
+    state,
+    city,
+  }: any) => {
     const token = localStorage.getItem('token');
     const userId = token ? getUserID(token) : null;
 
@@ -19,6 +27,9 @@ const CreatePost = () => {
     formData.append('user_id', userId!);
     formData.append('jobs', JSON.stringify(jobs.map((job: any) => job.value)));
     files.forEach((file: File) => formData.append('files', file));
+    formData.append('country', country.label);
+    formData.append('state', state.label);
+    formData.append('city', city.label);
 
     try {
       const res = await fetch('http://localhost:3000/posts', {

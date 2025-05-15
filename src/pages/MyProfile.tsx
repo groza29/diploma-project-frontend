@@ -16,16 +16,19 @@ import Button from '../components/Button';
 import InputField from '../components/InputField';
 import SearchDropdown from '../components/SearchDropdown';
 import { OptionType } from '../models/OptionType';
+import { useParams } from 'react-router-dom';
 
 const MyProfile: React.FC = () => {
   const { avatarUrl, updateAvatar } = useAvatar();
   const token = localStorage.getItem('token');
+  const { id } = useParams();
+
   const user = token ? jwtDecode<JwtDecodeUserType>(token) : null;
   const [userData, setUserData] = useState<User>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();
-  const isMyProfile = location.pathname === '/my-profile';
+  const isMyProfile = !id || id === user?.id;
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [editedDescription, setEditedDescription] = useState('');
   const [editedInstagram, setEditedInstagram] = useState('');
@@ -33,7 +36,6 @@ const MyProfile: React.FC = () => {
   const [isEditJobs, setIsEditJob] = useState(false);
   const [jobsData, setJobData] = useState<OptionType[]>([]);
   const [selectedJobs, setSelectedJobs] = useState<OptionType[]>([]);
-
   useEffect(() => {
     const fetchJobsAndPrepareSelected = async () => {
       try {
@@ -57,7 +59,6 @@ const MyProfile: React.FC = () => {
           setJobData(sortedJobs);
         }
 
-        // 💡 If editing jobs, preselect the user's current jobs
         if (userData?.jobs && isMyProfile && isEditJobs) {
           const mappedSelectedJobs = userData.jobs.map((job: any) => ({
             label: job.name,
@@ -101,7 +102,8 @@ const MyProfile: React.FC = () => {
   };
   const fetchUser = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/users/${user?.id}`);
+      const userIdToFetch = id || user?.id;
+      const response = await fetch(`http://localhost:3000/users/${userIdToFetch}`);
       if (!response.ok) throw new Error('failed to fetch the user');
 
       const data = await response.json();
@@ -117,8 +119,7 @@ const MyProfile: React.FC = () => {
   };
   useEffect(() => {
     fetchUser();
-    console.log(userData);
-  }, []);
+  }, [id]);
   if (loading) return <p>Loading user...</p>;
   if (error) return <p>Error: {error}</p>;
 
@@ -186,7 +187,7 @@ const MyProfile: React.FC = () => {
                 <Image
                   source={avatarUrl}
                   alt="Avatar"
-                  className="w-full h-full object-cover group-hover:opacity-30 transition-opacity duration-300"
+                  className="w-full h-full object-cover group-hover:opacity-30 shadow-md transition-opacity duration-300"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <FileUpload className="text-white text-6xl" />
@@ -204,10 +205,14 @@ const MyProfile: React.FC = () => {
             )}
           </div>
         ) : (
-          <div className="w-32 h-32 rounded-full group overflow-hidden cursor-pointer relative">
+          <div className="w-32 h-32 rounded-full group overflow-hidden shadow-md cursor-pointer relative">
             {avatarUrl ? (
               <>
-                <Image source={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                <Image
+                  source={`http://localhost:3000/avatar/${id}`}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
               </>
             ) : (
               <>
