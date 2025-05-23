@@ -10,7 +10,6 @@ const UserMenu = ({ user, avatarUrl }: { user: any; avatarUrl: string }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const logout = useLogout();
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -28,18 +27,20 @@ const UserMenu = ({ user, avatarUrl }: { user: any; avatarUrl: string }) => {
         onClick={() => setMenuOpen(!menuOpen)}
       >
         <Avatar src={avatarUrl} alt="User Avatar" className="w-10 h-10" />
-        <div className="flex flex-col">
-          <span className="text-teal-600 font-semibold">{user?.firstName || 'Hello'}</span>
-          <span className="text-gray-600 text-sm">
-            {user?.lastName || 'hello'} {user?.firstName || 'hello'}
-          </span>
-        </div>
+        {user?.firstName && user?.lastName && (
+          <div className="flex flex-col">
+            <span className="text-teal-600 font-semibold">{user?.firstName || 'Hello'}</span>
+            <span className="text-gray-600 text-sm">
+              {user?.lastName || 'hello'} {user?.firstName || 'hello'}
+            </span>
+          </div>
+        )}
       </div>
 
       {menuOpen && (
-        <div className="absolute right-0 mt-2 w-48 h-32 bg-background rounded-lg shadow-lg z-70 flex flex-col">
+        <div className="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-lg z-50 flex flex-col border border-gray-200">
           <Button
-            className="mt-0"
+            className="!mt-0 !text-black hover:bg-gray-100"
             onClick={() => {
               navigate('/my-profile');
               setMenuOpen(false);
@@ -48,7 +49,16 @@ const UserMenu = ({ user, avatarUrl }: { user: any; avatarUrl: string }) => {
             nav={true}
             icon={<People />}
           />
-          <Button onClick={logout} text="Log out" nav={true} icon={<Logout />} />
+          <Button
+            className="!text-black hover:bg-gray-100"
+            onClick={() => {
+              logout();
+              setMenuOpen(false);
+            }}
+            text="Log out"
+            nav={true}
+            icon={<Logout />}
+          />
         </div>
       )}
     </div>

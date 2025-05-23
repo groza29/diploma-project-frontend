@@ -13,7 +13,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onFilesSelected }) => {
     (acceptedFiles: File[]) => {
       const updatedFiles = [...files, ...acceptedFiles];
       setFiles(updatedFiles);
-      onFilesSelected(updatedFiles); // send to parent
+      onFilesSelected(updatedFiles);
     },
     [files, onFilesSelected]
   );
@@ -42,8 +42,8 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onFilesSelected }) => {
           className="mx-auto w-32 h-32 object-contain"
         />
         <p className="text-lg font-light mt-4">Drag and drop photos to upload</p>
-        <div className="mt-2">
-          <Button text="Select files"  />
+        <div className="mt-2 flex items-center justify-center">
+          <Button text="Select files" />
         </div>
       </div>
 

@@ -13,4 +13,5 @@ export interface User {
   linkedin: string;
   instagram: string;
   createdAt: number;
+  score: number;
 }

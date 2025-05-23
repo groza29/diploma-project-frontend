@@ -12,7 +12,6 @@ import { Dialog, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import InputField from '../components/InputField';
 import FilterDisplay from '../components/FilterDisplay';
-import Links from '../components/Links';
 import { useNavigate } from 'react-router-dom';
 
 const Community: React.FC = () => {
@@ -485,7 +484,7 @@ const Community: React.FC = () => {
                       <img
                         src={user.avatarUrl}
                         onError={(e) => {
-                          e.currentTarget.onerror = null; // prevent infinite loop
+                          e.currentTarget.onerror = null;
                           e.currentTarget.src =
                             './images/undraw_professional-woman-avatar_ivds.svg';
                         }}
@@ -505,7 +504,6 @@ const Community: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-end gap-2">
-                      <Links text="See more" noUnderline={true} />
                       <Button
                         text={'Go To Profile'}
                         onClick={() => navigate(`/profile/${user.id}`)}
@@ -542,10 +540,12 @@ const Community: React.FC = () => {
             </>
           )}
 
-          {/* this works */}
-          {/* <div onClick={() => searchRef.current?.scrollIntoView({ behavior: 'smooth' })}>
-        <ArrowUpward />
-      </div> */}
+          <div
+            className="w-full flex justify-end pr-4"
+            onClick={() => searchRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            <ArrowUpward className="text-primary" />
+          </div>
         </div>
       )}
     </div>

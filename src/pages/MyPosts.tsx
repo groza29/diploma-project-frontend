@@ -4,20 +4,34 @@ import Button from '../components/Button';
 import getUserID from '../utils/User_Id';
 import Swal from 'sweetalert2';
 import PostCard from '../components/PostCard';
+import { Add } from '@mui/icons-material';
 
-interface PostType {
+export interface PostType {
   id: string;
   title: string;
   body: string;
-  photos?: string[];
+  user_id: string;
+  actionDate: Date;
+  status: boolean;
+  jobs?: string[];
   createdAt: number;
-  imagePreview?: string;
+  imagesUrls?: string[];
+  country?: string;
+  county?: string;
+  city?: string;
+  price?: string;
 }
 
 const MyPosts: React.FC = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<PostType[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 3;
+  const indexOfLastApp = currentPage * postsPerPage;
+  const indexOfFirstApp = indexOfLastApp - postsPerPage;
+  const currentPosts = posts.slice(indexOfFirstApp, indexOfLastApp);
+  const totalPages = Math.ceil(posts.length / postsPerPage);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -49,7 +63,7 @@ const MyPosts: React.FC = () => {
 
     fetchPosts();
   }, [userId]);
-
+  console.log(posts);
   const handleCreatePost = () => {
     navigate('/create-a-post');
   };
@@ -59,16 +73,23 @@ const MyPosts: React.FC = () => {
       <div className="flex flex-col justify-center items-center h-screen w-full text-center bg-background px-4">
         <img src="/images/undraw_no-data_ig65.svg" alt="No posts" className="w-48 h-48 mb-6" />
         <p className="text-text text-lg font-light mb-6">You currently don’t have any posts.</p>
-        <Button text="Create a post" onClick={handleCreatePost} />
+        <Button text="Create a post" onClick={handleCreatePost} icon={<Add />} />
       </div>
     );
   }
 
   return (
     <div className="w-screen min-h-screen bg-background px-8 py-10">
-      <h2 className="text-2xl font-thin mb-6 text-text">My posts</h2>
+      <div className=" w-full flex items-center mb-6">
+        <div className="w-1/2 flex items-center">
+          <h2 className="text-2xl font-thin text-text">My posts</h2>
+        </div>
+        <div className="w-1/2 flex items-center justify-end">
+          <Button text={'Create a new Post'} icon={<Add />} onClick={handleCreatePost} />
+        </div>
+      </div>
       <div className="flex flex-col gap-4">
-        {posts.map((post: any) => (
+        {currentPosts.map((post: any) => (
           <PostCard
             key={post.id}
             id={post.id}
@@ -76,10 +97,26 @@ const MyPosts: React.FC = () => {
             body={post.body}
             images={post.imagesUrls}
             status={post.status}
-            onSeeMore={() => navigate(`/post/${post.id}`)}
+            actionDate={post.actionDate}
+            price={post.price}
             onEdit={() => navigate(`/edit-post/${post.id}`)}
           />
         ))}
+      </div>
+      <div className="flex justify-center items-center gap-6 mt-4">
+        <Button
+          text="Previous"
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        />
+        <span className="text-sm text-text-secondary pt-2">
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          text="Next"
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        />
       </div>
     </div>
   );

@@ -1,7 +1,16 @@
 import { jwtDecode } from 'jwt-decode';
 import JwtDecodeUserType from '../models/JwtDecodeUserType';
 import Image from '../components/Image';
-import { Add, Edit, FileUpload, Instagram, PlaceOutlined, Save } from '@mui/icons-material';
+import {
+  Add,
+  Delete,
+  Edit,
+  FileUpload,
+  Instagram,
+  LocalPhone,
+  PlaceOutlined,
+  Save,
+} from '@mui/icons-material';
 import Swal from 'sweetalert2';
 import { useAvatar } from '../context/AvatarContext';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
@@ -11,31 +20,44 @@ import { User } from '../models/UsersModel';
 import ProfileJob from '../components/ProfileJob';
 import { Job } from '../models/JobType';
 import getAccountAge from '../utils/AccountAge';
-import { useLocation } from 'react-router-dom';
 import Button from '../components/Button';
 import InputField from '../components/InputField';
 import SearchDropdown from '../components/SearchDropdown';
 import { OptionType } from '../models/OptionType';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ApplicationWithPosts } from './MyApplications';
 
 const MyProfile: React.FC = () => {
   const { avatarUrl, updateAvatar } = useAvatar();
   const token = localStorage.getItem('token');
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const user = token ? jwtDecode<JwtDecodeUserType>(token) : null;
   const [userData, setUserData] = useState<User>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const location = useLocation();
-  const isMyProfile = !id || id === user?.id;
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [editedDescription, setEditedDescription] = useState('');
   const [editedInstagram, setEditedInstagram] = useState('');
   const [editedLinkedin, setEditedLinkedin] = useState('');
+  const [editedPhone, setEditedPhone] = useState('');
   const [isEditJobs, setIsEditJob] = useState(false);
   const [jobsData, setJobData] = useState<OptionType[]>([]);
   const [selectedJobs, setSelectedJobs] = useState<OptionType[]>([]);
+  const [applicaions, setApplications] = useState<ApplicationWithPosts[]>([]);
+  let admin: any = null;
+  if (token) {
+    try {
+      admin = jwtDecode(token);
+    } catch (error) {
+      console.error('Invalid token', error);
+    }
+  }
+  const isAdmin = admin.role === 'admin';
+  console.log(isAdmin);
+  const isMyProfile = !id || id === user?.id || isAdmin;
+
   useEffect(() => {
     const fetchJobsAndPrepareSelected = async () => {
       try {
@@ -111,14 +133,56 @@ const MyProfile: React.FC = () => {
       setEditedDescription(data.description);
       setEditedInstagram(data.instagram);
       setEditedLinkedin(data.linkedin);
+      setEditedPhone(data.phoneNumber);
       setLoading(false);
     } catch (err: any) {
       setError(err.message);
       setLoading(false);
     }
   };
+  const handleDelete = async () => {
+    try {
+      const userIdToFetch = id || user?.id;
+
+      const res = await fetch(`http://localhost:3000/users/${userIdToFetch}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Failed to delete the post');
+
+      Swal.fire('Success', 'Post Deleted!', 'success');
+      navigate('/comunity');
+    } catch (err: any) {
+      Swal.fire('Error', err.message, 'error');
+    }
+  };
+  const fetchApplications = async () => {
+    try {
+      const userIdToFetch = id || user?.id;
+      const response = await fetch(`http://localhost:3000/applications/user/${userIdToFetch}`);
+      const data = await response.json();
+      console.log(data);
+
+      let applicationsArray: any[] = [];
+
+      if (Array.isArray(data.applications)) {
+        applicationsArray = data.applications;
+      } else if (Array.isArray(data)) {
+        applicationsArray = data;
+      }
+
+      const sortedApplications = applicationsArray.sort((a, b) => b.actionDate - a.actionDate);
+      const filteredApplications = sortedApplications.filter(
+        (app) => app.status === false && app.accepted === 'Accepted' && app.feedback && app.rating
+      );
+      setApplications(filteredApplications);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+    }
+  };
+
   useEffect(() => {
     fetchUser();
+    fetchApplications();
   }, [id]);
   if (loading) return <p>Loading user...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -230,14 +294,31 @@ const MyProfile: React.FC = () => {
             <h2 className="lg:text-5xl text-xl font-bold text-primary">{userData!.firstName}</h2>
           </div>
           <div className="w-full flex justify-between">
-            <div className="w-full flex">
-              <PlaceOutlined className="text-primary" />
-              <h2>
-                {userData!.country} {userData!.county} {userData!.city}{' '}
-              </h2>
+            <div className="flex flex-col gap-2">
+              <div className="w-full flex gap-1">
+                <PlaceOutlined className="text-primary" />
+                <h2>
+                  {userData!.country} {userData!.county} {userData!.city}{' '}
+                </h2>
+              </div>
+              <div className="flex items-center gap-1">
+                <LocalPhone className="text-primary cursor-pointer" />
+                {isEditingDescription ? (
+                  <InputField
+                    label={''}
+                    type={'text'}
+                    placeholder="phone number"
+                    value={editedPhone}
+                    onChange={(e) => setEditedPhone(e.target.value)}
+                  />
+                ) : (
+                  <h2>{userData!.phoneNumber}</h2>
+                )}
+              </div>
             </div>
-            <div>
-              <div className=" w-full flex justify-center items-center">
+
+            <div className="flex flex-col gap-2">
+              <div className=" w-full flex justify-center items-center gap-2">
                 <Instagram
                   onClick={() =>
                     userData?.instagram
@@ -300,6 +381,7 @@ const MyProfile: React.FC = () => {
                             description: editedDescription,
                             instagram: editedInstagram,
                             linkedin: editedLinkedin,
+                            phoneNumber: editedPhone,
                           }),
                         });
                         if (!response.ok) throw new Error('Failed to update description');
@@ -310,6 +392,7 @@ const MyProfile: React.FC = () => {
                                 description: editedDescription,
                                 instagram: editedInstagram,
                                 linkedin: editedLinkedin,
+                                phoneNumber: editedPhone,
                               }
                             : prev
                         );
@@ -358,9 +441,6 @@ const MyProfile: React.FC = () => {
                 },
               }}
             />
-            <p className="text-md text-text mt-2">
-              <span className="text-text font-semibold text-lg">4/5</span> out of 12 reviews
-            </p>
           </div>
         </div>
       </div>
@@ -451,15 +531,55 @@ const MyProfile: React.FC = () => {
       </div>
       <div className="bg-background flex justify-center flex-wrap items-center py-10 gap-12 flex-col md:flex-row lg:flex-row">
         <div className="bg-white rounded-2xl shadow-lg p-10 lg:w-1/5 w-4/5 md:w-2/5">
-          <h2 className="text-2xl text-text mb-4">Currently working with...</h2>
-          <div className="inline-flex  bg-selected bg-opacity-45 items-center space-x-2  text-text pr-10 rounded-full">
-            <img src={avatarUrl} alt="Employer" className="w-12 h-12 rounded-full object-cover" />
-            <span className="text-sm text-text font-medium">Employer name</span>
+          <h2 className="text-2xl text-text mb-4">Last Job</h2>
+          {applicaions.length > 0 && applicaions[0]?.post && (
+            <div className="inline-flex bg-selected bg-opacity-45 items-center space-x-2 text-text pr-10 rounded-full">
+              <img
+                src={applicaions[0].post.imagesUrls?.[0] || '/images/undraw_photos_09tf.svg'}
+                alt="Employer"
+                className="w-12 h-12 rounded-full object-cover"
+              />
+              <span className="text-sm text-text font-medium">{applicaions[0].post.title}</span>
+              <p className="text-sm text-text font-thin">{applicaions[0].post.body}</p>
+            </div>
+          )}
+        </div>
+        <div className="bg-white rounded-2xl shadow-lg p-10 w-5/6 lg:w-4/6 h-1/4">
+          <h2 className="text-2xl text-text mb-4">Work Feedback</h2>
+          <div>
+            {applicaions.map((app) => (
+              <div className="flex flex-row w-full items-center">
+                <div className="w-2/3 flex items-center">
+                  <h3>{app.feedback}</h3>
+                </div>
+                <div className="w-1/3 flex items-center justify-end">
+                  <Rating
+                    value={app.rating}
+                    precision={0.5}
+                    readOnly
+                    className="text-primary text-2xl"
+                    sx={{
+                      '& .MuiRating-iconFilled': {
+                        color: '#0C969C',
+                      },
+                      '& .MuiRating-iconEmpty': {
+                        color: '#031716',
+                      },
+                    }}
+                  />{' '}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="bg-white rounded-2xl shadow-lg p-10 w-5/6 lg:w-4/6">
-          <h2 className="text-2xl text-text mb-4">Work History</h2>
-        </div>
+        {isAdmin && (
+          <Button
+            text={'Delete User'}
+            icon={<Delete />}
+            className="bg-red"
+            onClick={handleDelete}
+          />
+        )}
       </div>
     </div>
   );

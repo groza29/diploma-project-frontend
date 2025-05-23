@@ -39,6 +39,7 @@ const EditPost: React.FC = () => {
           country: data.country,
           state: data.state,
           city: data.city,
+          price: data.price,
         });
         setLoading(false);
       } catch (error) {
@@ -60,6 +61,7 @@ const EditPost: React.FC = () => {
     country,
     state,
     city,
+    price,
   }: {
     title: string;
     description: string;
@@ -70,6 +72,7 @@ const EditPost: React.FC = () => {
     country: OptionType;
     state: OptionType;
     city: OptionType;
+    price: string;
   }) => {
     const token = localStorage.getItem('token');
     const userId = token ? getUserID(token) : null;
@@ -82,7 +85,7 @@ const EditPost: React.FC = () => {
     formData.append('country', country!.label);
     formData.append('state', state!.label);
     formData.append('city', city!.label);
-
+    formData.append('price', price);
     imagesUrls.forEach((url) => {
       formData.append('imagesUrls', url);
     });
@@ -132,6 +135,7 @@ const EditPost: React.FC = () => {
       initialCountry={postData.country}
       initialState={postData.state}
       initialCity={postData.city}
+      initialPrice={postData.price}
     />
   );
 };

@@ -22,6 +22,7 @@ interface PostFormProps {
   initialCountry?: string;
   initialState?: string;
   initialCity?: string;
+  initialPrice?: string;
   onSubmit: (form: {
     title: string;
     description: string;
@@ -32,6 +33,7 @@ interface PostFormProps {
     country: OptionType;
     state: OptionType;
     city: OptionType;
+    price: string;
   }) => void;
   handleDelete?: () => void;
 }
@@ -48,6 +50,7 @@ const PostForm: React.FC<PostFormProps> = ({
   initialCountry,
   initialState,
   initialCity,
+  initialPrice = '',
 }) => {
   const GEO_NAMES_USERNAME = 'groza29';
 
@@ -64,6 +67,7 @@ const PostForm: React.FC<PostFormProps> = ({
   const [countries, setCountries] = useState<OptionType[]>([]);
   const [states, setStates] = useState<OptionType[]>([]);
   const [cities, setCities] = useState<OptionType[]>([]);
+  const [price, setPrice] = useState<string>(initialPrice);
 
   const formatDate = (timestamp: number) => new Date(timestamp).toISOString().split('T')[0];
   useEffect(() => {
@@ -248,6 +252,7 @@ const PostForm: React.FC<PostFormProps> = ({
       country: country,
       state: state,
       city: city,
+      price: price,
     });
   };
   const handleDeleteImage = (index: number) => {
@@ -290,13 +295,20 @@ const PostForm: React.FC<PostFormProps> = ({
     <div className="w-screen lg:h-max h-auto bg-background ">
       <div className="flex lg:flex-row flex-col md:items-center">
         <div className="lg:w-2/4 w-3/4 p-8 flex flex-col xs:items-center ">
-          <div className="lg:w-2/4 w-3/4 min-w-48 ">
+          <div className="lg:w-full w-3/4 flex gap-2 ">
             <InputField
               label="Title"
               type="text"
               placeholder="Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+            />
+            <InputField
+              label="Price"
+              type="text"
+              placeholder="Price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
             />
           </div>
           <div className="pt-4 w-4/4">

@@ -16,7 +16,7 @@ const UserNavBar: React.FC = () => {
       <div className="flex px-4 ml-2">
         <ul className="hidden lg:flex gap-6 text-text justify-end font-light items-center">
           <ItemsNavBar
-            items={['Home', 'Posts', 'Community', 'My Profile', 'My Posts', 'Create a Post']}
+            items={['Home', 'Posts', 'Community', 'My Posts', 'My Applications', 'My Profile']}
           />
         </ul>
         <UserMenu user={user} avatarUrl={avatarUrl} />

@@ -16,6 +16,7 @@ const CreatePost = () => {
     country,
     state,
     city,
+    price,
   }: any) => {
     const token = localStorage.getItem('token');
     const userId = token ? getUserID(token) : null;
@@ -25,11 +26,15 @@ const CreatePost = () => {
     formData.append('body', description);
     formData.append('actionDate', date.toString());
     formData.append('user_id', userId!);
-    formData.append('jobs', JSON.stringify(jobs.map((job: any) => job.value)));
+    formData.append(
+      'jobs',
+      jobs.map((job: any) => job.value)
+    );
     files.forEach((file: File) => formData.append('files', file));
     formData.append('country', country.label);
-    formData.append('state', state.label);
+    formData.append('county', state.label);
     formData.append('city', city.label);
+    formData.append('price', price);
 
     try {
       const res = await fetch('http://localhost:3000/posts', {

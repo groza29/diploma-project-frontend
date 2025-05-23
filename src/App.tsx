@@ -1,10 +1,4 @@
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import Home from './pages/Home';
-// import Posts from './pages/Posts';
-// import Community from './pages/Community';
-// import Profile from './pages/Profile';
-// import MyPosts from './pages/MyPosts';
-// import CreatePost from './pages/CreatePost';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import NavbarRoutes from './components/NavBar/NavBarRoutes';
@@ -15,6 +9,11 @@ import CreatePost from './pages/CreatePost';
 import MyPosts from './pages/MyPosts';
 import EditPost from './pages/EditPost';
 import Community from './pages/Comunity';
+import Post from './pages/Posts';
+import MyApplications from './pages/MyApplications';
+import Home from './pages/Home';
+import AdminApplications from './pages/Applications';
+import AdminJobsPage from './pages/Jobs';
 
 const App = () => {
   return (
@@ -42,7 +41,7 @@ const MainLayout = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/posts" element={<Home />} />
+            <Route path="/posts" element={<Post />} />
             <Route path="/community" element={<Community />} />
             <Route path="/my-posts" element={<MyPosts />} />
             <Route path="/create-a-post" element={<CreatePost />} />
@@ -51,6 +50,9 @@ const MainLayout = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/edit-post/:id" element={<EditPost />} />
             <Route path="/profile/:id" element={<MyProfile />} />
+            <Route path="/my-applications" element={<MyApplications />} />
+            <Route path="/applications" element={<AdminApplications />} />
+            <Route path="/jobs" element={<AdminJobsPage />} />
           </Routes>
         </UserProvider>
       </AvatarProvider>

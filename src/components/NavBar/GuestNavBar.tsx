@@ -9,7 +9,7 @@ const GuestNavBar: React.FC = () => {
 
       {/* Middle Section - Navigation */}
       <ul className="hidden lg:flex gap-6 text-text font-light items-center">
-        <ItemsNavBar items={['Home', 'Posts', 'Community']} />
+        <ItemsNavBar items={['Home']} />
         <Link
           className="px-3 py-1 mt-0 ml-7 bg-button text-text font-light rounded-md hover:bg-selected hover:text-text"
           to={'/login'}
