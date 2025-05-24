@@ -53,7 +53,7 @@ const PostForm: React.FC<PostFormProps> = ({
   initialPrice = '',
 }) => {
   const GEO_NAMES_USERNAME = 'groza29';
-
+  const token = localStorage.getItem('token');
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
   const [timestamp, setTimestamp] = useState(initialDate);
@@ -73,7 +73,11 @@ const PostForm: React.FC<PostFormProps> = ({
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await fetch('http://localhost:3000/jobs');
+        const res = await fetch('http://localhost:3000/jobs', {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
         const data = await res.json();
         const jobs = data.map((job: any) => ({
           label: job.name,

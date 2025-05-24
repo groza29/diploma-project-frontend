@@ -20,7 +20,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const decoded = jwtDecode<JwtDecodeUserType>(token);
         const userId = decoded.id;
 
-        fetch(`http://localhost:3000/users/${userId}`)
+        fetch(`http://localhost:3000/users/${userId}`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        })
           .then((res) => res.json())
           .then((data) => {
             setUser(data);

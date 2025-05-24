@@ -10,6 +10,8 @@ import { InfoOutlined } from '@mui/icons-material';
 import Tooltip from '@mui/material/Tooltip';
 
 const UserHome: React.FC = () => {
+  const token = localStorage.getItem('token');
+
   const navigator = useNavigate();
   const user = useUser();
   const [posts, setPosts] = useState<PostType[]>([]);
@@ -17,7 +19,11 @@ const UserHome: React.FC = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch('http://localhost:3000/posts');
+        const res = await fetch('http://localhost:3000/posts', {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
         const data = await res.json();
         const posts = Array.isArray(data.posts) ? data.posts : data;
 

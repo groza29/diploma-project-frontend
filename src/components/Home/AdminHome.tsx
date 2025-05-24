@@ -6,6 +6,8 @@ import { PostType } from '../../pages/MyPosts';
 import { Application } from '../../pages/MyApplications';
 
 const AdminHome: React.FC = () => {
+  const token = localStorage.getItem('token');
+
   const navigator = useNavigate();
   const [posts, setPosts] = useState<PostType[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
@@ -13,24 +15,40 @@ const AdminHome: React.FC = () => {
   const [jobs, setJobs] = useState<any[]>([]);
 
   const fetchPosts = async () => {
-    const res = await fetch('http://localhost:3000/posts');
+    const res = await fetch('http://localhost:3000/posts', {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    });
     const data = await res.json();
     setPosts(data);
   };
   const fetchApplications = async () => {
-    const res = await fetch('http://localhost:3000/applications');
+    const res = await fetch('http://localhost:3000/applications', {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    });
     const data = await res.json();
     setApplications(data);
   };
 
   const fetchUsers = async () => {
-    const res = await fetch('http://localhost:3000/applications');
+    const res = await fetch('http://localhost:3000/applications', {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    });
     const data = await res.json();
     setUsers(data);
   };
 
   const fetchJobs = async () => {
-    const res = await fetch('http://localhost:3000/jobs');
+    const res = await fetch('http://localhost:3000/jobs', {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    });
     const data = await res.json();
     setJobs(data);
   };

@@ -42,6 +42,8 @@ const PostCard: React.FC<PostCardProps> = ({
   actionDate,
   price,
 }) => {
+  const token = localStorage.getItem('token');
+
   const [statusDialogApplications, setStatusDialogApplications] = useState<boolean>(false);
   const [applications, setApplications] = useState<ApplicationWithUsers[]>([]);
   const [loading, setLoading] = useState(false);
@@ -59,7 +61,11 @@ const PostCard: React.FC<PostCardProps> = ({
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:3000/applications/post/${id}`);
+      const res = await fetch(`http://localhost:3000/applications/post/${id}`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+      });
       const data = await res.json();
       setApplications(data);
     } catch (err) {
@@ -85,6 +91,9 @@ const PostCard: React.FC<PostCardProps> = ({
     try {
       const response = await fetch(`http://localhost:3000/accept/${applicationId}`, {
         method: 'PUT',
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
       });
 
       if (!response.ok) {
@@ -105,6 +114,9 @@ const PostCard: React.FC<PostCardProps> = ({
     try {
       const response = await fetch(`http://localhost:3000/reject/${applicationId}`, {
         method: 'PUT',
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
       });
 
       if (!response.ok) {
@@ -130,6 +142,7 @@ const PostCard: React.FC<PostCardProps> = ({
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: token ? `Bearer ${token}` : '',
         },
         body: JSON.stringify({
           feedback: feedback,

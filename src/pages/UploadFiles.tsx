@@ -6,6 +6,8 @@ const AvatarUpload: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const token = localStorage.getItem('token');
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -19,7 +21,11 @@ const AvatarUpload: React.FC = () => {
   useEffect(() => {
     const fetchAvatar = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/avatar/${userId}`);
+        const response = await fetch(`http://localhost:3000/avatar/${userId}`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
         const data = await response.json();
         setAvatarUrl(data.avatarUrl);
       } catch (error) {
@@ -51,6 +57,9 @@ const AvatarUpload: React.FC = () => {
       const response = await fetch(`http://localhost:3000/upload-avatar/${userId}`, {
         method: 'POST',
         body: formData,
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
       });
 
       if (!response.ok) throw new Error('Failed to upload avatar');

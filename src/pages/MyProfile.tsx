@@ -61,7 +61,11 @@ const MyProfile: React.FC = () => {
   useEffect(() => {
     const fetchJobsAndPrepareSelected = async () => {
       try {
-        const response = await fetch('http://localhost:3000/jobs');
+        const response = await fetch('http://localhost:3000/jobs', {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
         const data = await response.json();
         if (userData?.jobs) {
           const sortedJobs = data
@@ -112,6 +116,9 @@ const MyProfile: React.FC = () => {
       const response = await fetch(`http://localhost:3000/upload-avatar/${user?.id}`, {
         method: 'POST',
         body: formData,
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
       });
 
       if (!response.ok) throw new Error('Failed to upload avatar');
@@ -125,7 +132,11 @@ const MyProfile: React.FC = () => {
   const fetchUser = async () => {
     try {
       const userIdToFetch = id || user?.id;
-      const response = await fetch(`http://localhost:3000/users/${userIdToFetch}`);
+      const response = await fetch(`http://localhost:3000/users/${userIdToFetch}`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+      });
       if (!response.ok) throw new Error('failed to fetch the user');
 
       const data = await response.json();
@@ -146,6 +157,9 @@ const MyProfile: React.FC = () => {
 
       const res = await fetch(`http://localhost:3000/users/${userIdToFetch}`, {
         method: 'DELETE',
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
       });
       if (!res.ok) throw new Error('Failed to delete the post');
 
@@ -158,7 +172,11 @@ const MyProfile: React.FC = () => {
   const fetchApplications = async () => {
     try {
       const userIdToFetch = id || user?.id;
-      const response = await fetch(`http://localhost:3000/applications/user/${userIdToFetch}`);
+      const response = await fetch(`http://localhost:3000/applications/user/${userIdToFetch}`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+      });
       const data = await response.json();
       console.log(data);
 
@@ -376,7 +394,10 @@ const MyProfile: React.FC = () => {
                       try {
                         const response = await fetch(`http://localhost:3000/users/${user?.id}`, {
                           method: 'PUT',
-                          headers: { 'Content-Type': 'application/json' },
+                          headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: token ? `Bearer ${token}` : '',
+                          },
                           body: JSON.stringify({
                             description: editedDescription,
                             instagram: editedInstagram,
@@ -458,7 +479,10 @@ const MyProfile: React.FC = () => {
                     try {
                       const response = await fetch(`http://localhost:3000/users/${user?.id}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: token ? `Bearer ${token}` : '',
+                        },
                         body: JSON.stringify({
                           jobs: selectedJobs.map((job) => job.value),
                         }),

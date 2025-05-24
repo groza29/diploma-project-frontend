@@ -25,6 +25,8 @@ interface Job {
 }
 
 const AdminJobsPage: React.FC = () => {
+  const token = localStorage.getItem('token');
+
   const [jobs, setJobs] = useState<Job[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
@@ -37,7 +39,11 @@ const AdminJobsPage: React.FC = () => {
 
   const fetchJobs = async () => {
     try {
-      const res = await fetch('http://localhost:3000/jobs');
+      const res = await fetch('http://localhost:3000/jobs', {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+      });
       const data = await res.json();
       setJobs(data);
     } catch (err) {
@@ -69,7 +75,10 @@ const AdminJobsPage: React.FC = () => {
     try {
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token ? `Bearer ${token}` : '',
+        },
         body: JSON.stringify(form),
       });
 
@@ -84,7 +93,12 @@ const AdminJobsPage: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await fetch(`http://localhost:3000/jobs/${id}`, { method: 'DELETE' });
+      await fetch(`http://localhost:3000/jobs/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+      });
       fetchJobs();
     } catch (err) {
       console.error('Delete failed:', err);

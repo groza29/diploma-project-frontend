@@ -22,6 +22,8 @@ export interface ApplicationWithPosts extends Omit<Application, 'post_id'> {
 }
 
 const MyApplications = () => {
+  const token = localStorage.getItem('token');
+
   const [userId, setUserId] = useState<string | null>(null);
   const [applications, setApplications] = useState<ApplicationWithPosts[]>([]);
   const navigate = useNavigate();
@@ -47,7 +49,11 @@ const MyApplications = () => {
 
     const fetchApplications = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/applications/user/${userId}`);
+        const response = await fetch(`http://localhost:3000/applications/user/${userId}`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
         const data = await response.json();
         console.log(data);
 

@@ -6,6 +6,8 @@ import { OptionType } from '../models/OptionType';
 import getUserID from '../utils/User_Id';
 
 const EditPost: React.FC = () => {
+  const token = localStorage.getItem('token');
+
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -15,10 +17,18 @@ const EditPost: React.FC = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/posts/${id}`);
+        const res = await fetch(`http://localhost:3000/posts/${id}`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
         const data = await res.json();
 
-        const jobsRes = await fetch('http://localhost:3000/jobs');
+        const jobsRes = await fetch('http://localhost:3000/jobs', {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
         const jobs = await jobsRes.json();
         const formattedJobs = jobs.map((job: any) => ({
           label: job.name,
@@ -96,6 +106,9 @@ const EditPost: React.FC = () => {
       const res = await fetch(`http://localhost:3000/posts/${id}`, {
         method: 'PUT',
         body: formData,
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
       });
 
       if (!res.ok) throw new Error('Failed to update post');
@@ -111,6 +124,9 @@ const EditPost: React.FC = () => {
     try {
       const res = await fetch(`http://localhost:3000/posts/${id}`, {
         method: 'DELETE',
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
       });
       if (!res.ok) throw new Error('Failed to delete the post');
 

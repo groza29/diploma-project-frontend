@@ -23,6 +23,8 @@ export interface PostType {
 }
 
 const MyPosts: React.FC = () => {
+  const token = localStorage.getItem('token');
+
   const navigate = useNavigate();
   const [posts, setPosts] = useState<PostType[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
@@ -48,7 +50,11 @@ const MyPosts: React.FC = () => {
 
     const fetchPosts = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/posts/user/${userId}`);
+        const response = await fetch(`http://localhost:3000/posts/user/${userId}`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
         const data = await response.json();
 
         if (Array.isArray(data.posts)) {

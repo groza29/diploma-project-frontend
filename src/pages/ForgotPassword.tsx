@@ -19,7 +19,7 @@ const ForgotPassword: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/users/${id.id}`, {
+      const response = await fetch(`http://localhost:3000/password/${id.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -89,10 +89,17 @@ const Posts: React.FC = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch('http://localhost:3000/posts');
+        const res = await fetch('http://localhost:3000/posts', {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
         const data = await res.json();
         const posts = Array.isArray(data.posts) ? data.posts : data;
-        setAllPosts(posts);
+
+        setAllPosts(
+          posts.filter((post: PostType) => post.status === true && post.user_id !== user?.id)
+        );
       } catch (err) {
         console.error('Error loading posts:', err);
       }
@@ -111,13 +118,17 @@ const Posts: React.FC = () => {
     setStatusSearched(true);
 
     try {
-      const res = await fetch('http://localhost:3000/posts');
+      const res = await fetch('http://localhost:3000/posts', {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+      });
       const data = await res.json();
       const posts: PostType[] = Array.isArray(data.posts) ? data.posts : data;
       const othersPosts = posts.filter((post) => post.user_id != user?.id);
       const filtered = othersPosts.filter((post: PostType) => {
         const actionTime = Number(post.actionDate);
-
+        const openPosts = post.status === true;
         const matchesTitle = title === '' || post.title.toLowerCase().includes(title.toLowerCase());
         const matchesJob = !selectedJob || (post.jobs && post.jobs.includes(selectedJob.value));
         const matchesCountry = !country || post.country === country.label;
@@ -136,7 +147,8 @@ const Posts: React.FC = () => {
           matchesCounty &&
           matchesCity &&
           matchesStartDate &&
-          matchesEndDate
+          matchesEndDate &&
+          openPosts
         );
       });
 
@@ -153,7 +165,11 @@ const Posts: React.FC = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await fetch('http://localhost:3000/jobs');
+        const res = await fetch('http://localhost:3000/jobs', {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
         const data = await res.json();
         const jobs = data.map((job: any) => ({
           label: job.name,
@@ -297,7 +313,10 @@ const Posts: React.FC = () => {
     try {
       const res = await fetch('http://localhost:3000/application', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token ? `Bearer ${token}` : '',
+        },
         body: JSON.stringify({
           post_id: postId,
           user_id: user.id,

@@ -17,6 +17,8 @@ import { useNavigate } from 'react-router-dom';
 const Community: React.FC = () => {
   const GEO_NAMES_USERNAME = 'groza29';
   const { user } = useUser();
+  const token = localStorage.getItem('token');
+
   const [users, setUsers] = useState<any[]>([]);
 
   const navigate = useNavigate();
@@ -62,7 +64,11 @@ const Community: React.FC = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await fetch('http://localhost:3000/jobs');
+        const res = await fetch('http://localhost:3000/jobs', {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+        });
         const data = await res.json();
         const jobs = data.map((job: any) => ({
           label: job.name,
@@ -210,7 +216,11 @@ const Community: React.FC = () => {
     setStatusSearched(true);
 
     try {
-      const res = await fetch('http://localhost:3000/users');
+      const res = await fetch('http://localhost:3000/users', {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+      });
       const data = await res.json();
 
       const filtered = data.filter((user: any) => {

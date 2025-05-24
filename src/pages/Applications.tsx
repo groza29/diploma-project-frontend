@@ -24,12 +24,18 @@ interface Application {
 }
 
 const AdminApplications: React.FC = () => {
+  const token = localStorage.getItem('token');
+
   const [applications, setApplications] = useState<Application[]>([]);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const fetchApplications = async () => {
-    const res = await fetch('http://localhost:3000/applications');
+    const res = await fetch('http://localhost:3000/applications', {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    });
     const data = await res.json();
     setApplications(data);
   };
@@ -43,7 +49,10 @@ const AdminApplications: React.FC = () => {
     if (!selectedApp) return;
     await fetch(`http://localhost:3000/applications/${selectedApp.id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token ? `Bearer ${token}` : '',
+      },
       body: JSON.stringify(selectedApp),
     });
     setEditDialogOpen(false);
@@ -53,6 +62,9 @@ const AdminApplications: React.FC = () => {
   const handleDelete = async (id: string) => {
     await fetch(`http://localhost:3000/applications/${id}`, {
       method: 'DELETE',
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
     });
     fetchApplications();
   };

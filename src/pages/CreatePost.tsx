@@ -40,6 +40,9 @@ const CreatePost = () => {
       const res = await fetch('http://localhost:3000/posts', {
         method: 'POST',
         body: formData,
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
       });
 
       if (!res.ok) throw new Error('Failed to create post');
