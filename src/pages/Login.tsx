@@ -75,7 +75,6 @@ const Login: React.FC = () => {
       inputPlaceholder: 'Your email',
       showCancelButton: true,
       confirmButtonText: 'Reset Password',
-      width: '25%',
       customClass: {
         confirmButton:
           'bg-primary text-text py-2 rounded-md mt-2 mb hover:bg-selected transition hover:text-white font-thin',
@@ -84,8 +83,36 @@ const Login: React.FC = () => {
         input: 'w-4/5 placeholder-selected placeholder-opacity-45 focus:outline-none ',
       },
     });
+
     if (email) {
-      Swal.fire(`Entered email: ${email}`);
+      try {
+        const response = await fetch('http://localhost:3000/forgot-password', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to send reset email');
+        }
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'A password reset link has been sent to your email.',
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      } catch (err: any) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: err.message || 'Something went wrong!',
+        });
+      }
     }
   };
 
