@@ -14,6 +14,7 @@ import MyApplications from './pages/MyApplications';
 import Home from './pages/Home';
 import AdminApplications from './pages/Applications';
 import AdminJobsPage from './pages/Jobs';
+import ForgotPassword from './pages/ForgotPassword';
 
 const App = () => {
   return (
@@ -27,15 +28,18 @@ const App = () => {
 const MainLayout = () => {
   const location = useLocation();
 
-  // Pages where the navbar should NOT be displayed
   const hideNavbarRoutes = ['/login', '/register'];
+
+  const shouldHideNavbar =
+    hideNavbarRoutes.includes(location.pathname) ||
+    /^\/forgot-password\/[^/]+$/.test(location.pathname);
 
   return (
     <div>
       <AvatarProvider>
         <UserProvider>
           {/* Conditionally render Navbar */}
-          {!hideNavbarRoutes.includes(location.pathname) && <NavbarRoutes />}
+          {!shouldHideNavbar && <NavbarRoutes />}
 
           {/* Page Content */}
           <Routes>
@@ -53,6 +57,7 @@ const MainLayout = () => {
             <Route path="/my-applications" element={<MyApplications />} />
             <Route path="/applications" element={<AdminApplications />} />
             <Route path="/jobs" element={<AdminJobsPage />} />
+            <Route path="/forgot-password/:id" element={<ForgotPassword />} />
           </Routes>
         </UserProvider>
       </AvatarProvider>

@@ -75,7 +75,7 @@ const AdminHome: React.FC = () => {
         </div>
         <div
           className="w-1/5 h-1/2 flex flex-col border bg-white border shadow-lg rounded-xl cursor-pointer"
-          onClick={() => navigator('/comunity')}
+          onClick={() => navigator('/community')}
         >
           <div className=" h-1/4 w-full py-4 flex items-center justify-center">
             <h3 className="text-4xl text-selected mt-4 font-bold">Users</h3>
